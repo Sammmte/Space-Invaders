@@ -1,4 +1,4 @@
-package;
+package source.states;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -12,6 +12,8 @@ class MenuState extends FlxState
 	override public function create():Void
 	{
 		super.create();
+		
+		FlxG.switchState(new PlayState());
 	}
 
 	override public function update(elapsed:Float):Void
