@@ -11,8 +11,8 @@ import flixel.FlxG;
  
 class Nave extends FlxSprite
 {
-	private var shot:Disparo;
-	static public var disparo:Bool = false;
+	private var disparo:Disparo;
+	static public var puedeDisparar:Bool = true;
 
 	public function new(?X:Float=0, ?Y:Float=0, ?SimpleGraphic:FlxGraphicAsset) 
 	{
@@ -40,27 +40,35 @@ class Nave extends FlxSprite
 			x -= Reg.playerVelX;
 			LimitPosition();
 		}
-		if (FlxG.keys.justPressed.X)
+		if (puedeDisparar)
 		{
-			Disparar();
+			if (FlxG.keys.justPressed.X)
+			{
+				Disparar();
+			}
+		}
+		if (!puedeDisparar)
+		{
+			if (disparo.Colisiono())
+			{
+				puedeDisparar = true;
+				disparo.destroy();
+			}
 		}
 	}
 	
 	private function Disparar():Void
 	{
-		if (!disparo)
-		{
-			shot = new Disparo();
-			shot.x = x + width/2;
-			shot.y = y - shot.height;
+		disparo = new Disparo();
+		disparo.x = x + width/2;
+		disparo.y = y - disparo.height;
 		
-			FlxG.state.add(shot);
+		FlxG.state.add(disparo);
 			
-			disparo = true;
-		}
+		puedeDisparar = false;
 	}
 	
-	private function LimitPosition()
+	private function LimitPosition():Void
 	{
 		if (x < Reg.leftXLimit)
 		{

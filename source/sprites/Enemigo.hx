@@ -3,21 +3,23 @@ package sprites;
 import flixel.FlxSprite;
 import flixel.system.FlxAssets.FlxGraphicAsset;
 import flixel.FlxG;
-import sprites.Nave;
+import flixel.group.FlxGroup;
 
 /**
  * ...
  * @author ...
  */
-class Disparo extends FlxSprite
+class Enemigo extends FlxSprite
 {
+	private var disparos:FlxTypedGroup<Disparo>;
+	
 	public function new(?X:Float=0, ?Y:Float=0, ?SimpleGraphic:FlxGraphicAsset) 
 	{
 		super(X, Y, SimpleGraphic);
 		
-		makeGraphic(2, 5);
+		makeGraphic(6, 6);
 		
-		velocity.y = Reg.shotVelocity;
+		disparo = new Disparo();
 	}
 	
 	override public function update(elapsed:Float):Void
@@ -25,4 +27,8 @@ class Disparo extends FlxSprite
 		super.update(elapsed);
 	}
 	
+	public function Disparar():Void
+	{
+		
+	}
 }
