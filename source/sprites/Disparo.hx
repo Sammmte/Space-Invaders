@@ -3,7 +3,6 @@ package sprites;
 import flixel.FlxSprite;
 import flixel.system.FlxAssets.FlxGraphicAsset;
 import flixel.FlxG;
-import sprites.Nave;
 
 /**
  * ...
@@ -23,6 +22,16 @@ class Disparo extends FlxSprite
 	override public function update(elapsed:Float):Void
 	{
 		super.update(elapsed);
+	}
+	
+	public function Colisiono():Bool
+	{
+		if (y < 0)
+		{
+			return true;
+		}
+		
+		return false;
 	}
 	
 }

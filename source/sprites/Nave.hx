@@ -33,12 +33,12 @@ class Nave extends FlxSprite
 		if (FlxG.keys.pressed.RIGHT)
 		{
 			x += Reg.playerVelX;
-			LimitPosition();
+			LimitarPosicion();
 		}
 		if (FlxG.keys.pressed.LEFT)
 		{
 			x -= Reg.playerVelX;
-			LimitPosition();
+			LimitarPosicion();
 		}
 		if (puedeDisparar)
 		{
@@ -68,7 +68,7 @@ class Nave extends FlxSprite
 		puedeDisparar = false;
 	}
 	
-	private function LimitPosition():Void
+	private function LimitarPosicion():Void
 	{
 		if (x < Reg.leftXLimit)
 		{

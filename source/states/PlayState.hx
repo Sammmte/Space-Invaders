@@ -20,7 +20,6 @@ class PlayState extends FlxState
 	private var enemigos:FlxTypedGroup<Enemigo>;
 	private var timer:FlxTimer;
 	
-	
 	override public function create():Void
 	{
 		super.create();
@@ -58,10 +57,10 @@ class PlayState extends FlxState
 		super.update(elapsed);
 	}
 	
+	
+	
 	private function EnemigoRandomDispara():Void
 	{
-		Reg.random.int(0, 54);
-		
-		enemigos.members[random]
+		enemigos.members[Reg.random.int(0,54)];
 	}
 }
