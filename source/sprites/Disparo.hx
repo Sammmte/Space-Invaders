@@ -14,9 +14,7 @@ class Disparo extends FlxSprite
 	{
 		super(X, Y, SimpleGraphic);
 		
-		makeGraphic(2, 5);
-		
-		velocity.y = Reg.shotVelocity;
+		loadGraphic(AssetPaths.balaprov__png);
 	}
 	
 	override public function update(elapsed:Float):Void
@@ -24,9 +22,9 @@ class Disparo extends FlxSprite
 		super.update(elapsed);
 	}
 	
-	public function Colisiono():Bool
+	public function IsOutStage():Bool
 	{
-		if (y < 0)
+		if (y < 0 || y > FlxG.height)
 		{
 			return true;
 		}
