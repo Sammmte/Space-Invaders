@@ -3,6 +3,7 @@ package sprites;
 import flixel.FlxSprite;
 import flixel.system.FlxAssets.FlxGraphicAsset;
 import flixel.FlxG;
+import flixel.system.FlxSound;
 import flixel.util.FlxTimer;
 
 /**
@@ -15,6 +16,8 @@ class Nave extends FlxSprite
 	public var disparo:Disparo;
 	public var puedeDisparar:Bool = true;
 	private var timerAux:FlxTimer;
+	private var sonidoMuerte:FlxSound;
+	private var sonidoDisparo:FlxSound;
 
 	public function new(?X:Float=0, ?Y:Float=0, ?SimpleGraphic:FlxGraphicAsset) 
 	{
@@ -26,6 +29,8 @@ class Nave extends FlxSprite
 		animation.play("normal");
 		
 		timerAux = new FlxTimer();
+		sonidoMuerte = Sounds.muerteNave;
+		sonidoDisparo = Sounds.disparo;
 	}
 	
 	override public function update(elapsed:Float):Void
@@ -43,7 +48,10 @@ class Nave extends FlxSprite
 			disparo.destroy();
 		}
 		
+		sonidoMuerte.play();
+		
 		animation.play("muerte");
+		puedeDisparar = false;
 		
 		timerAux.start(Reg.delayDeMuerte, PierdeUnaVida, 1);
 		
@@ -53,16 +61,22 @@ class Nave extends FlxSprite
 	{
 		animation.play("normal");
 		Reg.vidas--;
+		puedeDisparar = true;
+		
+		timerAux.destroy();
 	}
 	
 	private function ComprobarDisparoY():Void
 	{
 		if (!puedeDisparar)
 		{
-			if (disparo.IsOutStage())
+			if (disparo != null)
 			{
-				puedeDisparar = true;
-				disparo.destroy();
+				if (disparo.IsOutStage())
+				{
+					puedeDisparar = true;
+					disparo.destroy();
+				}
 			}
 		}
 	}
@@ -95,6 +109,8 @@ class Nave extends FlxSprite
 		disparo.y = y - disparo.height;
 		disparo.velocity.y = Reg.disparoVelocityPlayer;
 		
+		sonidoDisparo.play();
+		
 		FlxG.state.add(disparo);
 			
 		puedeDisparar = false;
@@ -110,6 +126,13 @@ class Nave extends FlxSprite
 		{
 			x = Reg.rightXLimit;
 		}
+	}
+	
+	public function DestruirTodo():Void
+	{
+		timerAux.destroy();
+		sonidoDisparo.destroy();
+		sonidoMuerte.destroy();
 	}
 	
 }

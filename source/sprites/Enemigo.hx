@@ -5,6 +5,7 @@ import flixel.FlxSprite;
 import flixel.system.FlxAssets.FlxGraphicAsset;
 import flixel.FlxG;
 import flixel.group.FlxGroup;
+import flixel.system.FlxSound;
 import flixel.util.FlxTimer;
 
 /**
@@ -19,6 +20,12 @@ class Enemigo extends FlxSprite
 	public var auxY:Int;
 	public var puedeDisparar:Bool = true;
 	public var murio:Bool = false;
+	public var trick:Bool = false;
+	public var sonidoMuerte:FlxSound;
+	
+	
+	//Tipo 1: 30 puntos , Tipo 2: 20 , Tipo 3: 10 , Tipo 4: Random
+	public var tipo:Int = 0;
 	
 	public function new(?X:Float=0, ?Y:Float=0, ?SimpleGraphic:FlxGraphicAsset) 
 	{
@@ -29,6 +36,8 @@ class Enemigo extends FlxSprite
 		
 		timer = new FlxTimer();
 		timer.start(Reg.framesVelocidadEnemigos, OnComplete, 0);
+		
+		sonidoMuerte = Sounds.muerteEnemigo;
 	}
 	
 	override public function update(elapsed:Float):Void
@@ -36,8 +45,11 @@ class Enemigo extends FlxSprite
 		super.update(elapsed);
 		
 		ComprobarDisparoY();
+		if (trick)
+		{
+			Disparar();
+		}
 		timer.time = Reg.framesVelocidadEnemigos;
-		
 	}
 	
 	private function ComprobarDisparoY():Void
@@ -52,7 +64,7 @@ class Enemigo extends FlxSprite
 		}
 	}
 	
-	public function CargarSprite(tipo:Int):Void
+	public function CargarSprite():Void
 	{
 		if (tipo == 3)
 		{
@@ -78,9 +90,13 @@ class Enemigo extends FlxSprite
 			animation.add("muerte", [2], 0, false);
 			animation.play("uno");
 		}
+		/*else if(tipo == 4)
+		{
+			...
+		}*/
 	}
 	
-	public function Disparar():Disparo
+	public function Disparar():Void
 	{
 		disparo = new Disparo();
 		disparo.x = (x + width/2) - disparo.width/2;
@@ -89,15 +105,21 @@ class Enemigo extends FlxSprite
 		
 		puedeDisparar = false;
 		
-		return disparo;
+		FlxG.state.add(disparo);
+		
+		trick = false;
 	}
 	
 	private function OnComplete(timer:FlxTimer):Void
 	{
-		MoverPersonaje();
-		if (animation.name == "muerte")
+		if (!Reg.pausa)
 		{
-			Muerte();
+			Reg.musicaEnemigos = true;
+			MoverPersonaje();
+			if (murio)
+			{
+				Muerte();
+			}
 		}
 	}
 	
@@ -124,9 +146,10 @@ class Enemigo extends FlxSprite
 	private function Muerte():Void
 	{
 		timer.destroy();
-		destroy();
-		murio = true;
 		Reg.contEnemigos++;
+		destroy();
 	}
+	
+	
 	
 }
