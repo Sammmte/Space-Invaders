@@ -29,7 +29,7 @@ class Sounds
 		muerteNave = FlxG.sound.load(AssetPaths.explosion__wav, false);
 		muerteEnemigo = FlxG.sound.load(AssetPaths.invaderkilled__wav, false);
 		disparo = FlxG.sound.load(AssetPaths.shoot__wav, false);
-		sonidoOvni = FlxG.sound.load(AssetPaths.ufo_lowpitch__wav, true);
+		sonidoOvni = FlxG.sound.load(AssetPaths.ufo__wav, true);
 	}
 	
 	public function new() 

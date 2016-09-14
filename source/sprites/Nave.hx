@@ -18,6 +18,7 @@ class Nave extends FlxSprite
 	private var timerAux:FlxTimer;
 	private var sonidoMuerte:FlxSound;
 	private var sonidoDisparo:FlxSound;
+	public var murio:Bool = false;
 
 	public function new(?X:Float=0, ?Y:Float=0, ?SimpleGraphic:FlxGraphicAsset) 
 	{
@@ -41,6 +42,8 @@ class Nave extends FlxSprite
 		ComprobarDisparoY();
 	}
 	
+	/*<<<<<<<<<<<<MECANICA DE MUERTE>>>>>>>>>>>>>>*/
+	
 	public function Muerte():Void
 	{
 		if (disparo != null)
@@ -51,6 +54,7 @@ class Nave extends FlxSprite
 		sonidoMuerte.play();
 		
 		animation.play("muerte");
+		
 		puedeDisparar = false;
 		
 		timerAux.start(Reg.delayDeMuerte, PierdeUnaVida, 1);
@@ -62,24 +66,12 @@ class Nave extends FlxSprite
 		animation.play("normal");
 		Reg.vidas--;
 		puedeDisparar = true;
+		murio = false;
 		
 		timerAux.destroy();
 	}
 	
-	private function ComprobarDisparoY():Void
-	{
-		if (!puedeDisparar)
-		{
-			if (disparo != null)
-			{
-				if (disparo.IsOutStage())
-				{
-					puedeDisparar = true;
-					disparo.destroy();
-				}
-			}
-		}
-	}
+	/*<<<<<<<<<<<<CONTROLES>>>>>>>>>>>>>>*/
 	
 	public function ControlarNave():Void
 	{
@@ -116,6 +108,8 @@ class Nave extends FlxSprite
 		puedeDisparar = false;
 	}
 	
+	/*<<<<<<<<<<<<AUXILIARES>>>>>>>>>>>>>>*/
+	
 	private function LimitarPosicion():Void
 	{
 		if (x < Reg.leftXLimit)
@@ -133,6 +127,21 @@ class Nave extends FlxSprite
 		timerAux.destroy();
 		sonidoDisparo.destroy();
 		sonidoMuerte.destroy();
+	}
+	
+	private function ComprobarDisparoY():Void
+	{
+		if (!puedeDisparar)
+		{
+			if (disparo != null)
+			{
+				if (disparo.IsOutStage())
+				{
+					puedeDisparar = true;
+					disparo.destroy();
+				}
+			}
+		}
 	}
 	
 }

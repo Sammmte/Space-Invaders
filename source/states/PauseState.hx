@@ -1,6 +1,7 @@
 package states;
 
 import flixel.FlxSubState;
+import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import flixel.FlxG;
@@ -11,18 +12,13 @@ import flixel.FlxG;
  */
 class PauseState extends FlxSubState
 {
-	private var timer:FlxTimer;
+	private var textoOleada:FlxText;
 
-	public function new(BGColor:FlxColor=FlxColor.TRANSPARENT) 
+	public function new(BGColor:FlxColor = FlxColor.TRANSPARENT) 
 	{
 		super(BGColor);
 		
-		if (!Reg.pausa)
-		{
-			Reg.pausa = true;
-			timer = new FlxTimer();
-			timer.start(Reg.delayDeMuerte, Reset, 1);
-		}
+		
 	}
 	
 	override public function update(elapsed:Float):Void
@@ -43,12 +39,4 @@ class PauseState extends FlxSubState
 			close();
 		}
 	}
-	
-	private function Reset(timer:FlxTimer):Void
-	{
-		timer.destroy();
-		Reg.pausa = false;
-		close();
-	}
-	
 }

@@ -11,32 +11,32 @@ import flixel.math.FlxMath;
 import lime.graphics.Image;
 import sprites.Disparo;
 import sprites.Enemigo;
+import sprites.HUD;
 import sprites.Nave;
 import Reg;
 import Fonts;
 import Sounds;
 import flixel.group.FlxGroup;
 import flixel.util.FlxTimer;
-import states.AuxState;
 import states.PauseState;
+import states.ResultState;
 import flixel.system.FlxAssets.FlxGraphicAsset;
+import flixel.util.FlxColor;
 
 class PlayState extends FlxState
 {
+	//Sprites importantes
+	private var hud:HUD;
 	private var nave:Nave;
 	private var enemigos:FlxTypedGroup<Enemigo>;
-	//Auxiliar para manejar la direccion del grupo de enemigos
+	
+	//Auxiliar
 	private var direccionIzqEnemigos:Bool = false;
 	private var timer:FlxTimer;
-	private var perdio:Bool = false;
-	private var gano:Bool = false;
 	private var enemigosMuertosIndex:Array<Int>;
 	private var sonidoMusicaEnemigos:FlxSound;
 	private var vidasSprite:Nave;
 	
-	//Aca estan los scores. Cualquier cosa, mirar parametros y metodos de objetos FlxText
-	
-	private var scoreText:FlxText;
 	
 	override public function create():Void
 	{
@@ -45,8 +45,11 @@ class PlayState extends FlxState
 		Fonts.Init();
 		Sounds.Init();
 		
+		hud = new HUD();
+		
 		//Random estatico para cualquier necesidad
 		Reg.random = new FlxRandom();
+		
 		Reg.aceleracionEnemigos += Reg.aumentoAceleracion;
 		Reg.framesVelocidadEnemigos = 1;
 		
@@ -68,52 +71,121 @@ class PlayState extends FlxState
 		//mediante el descarte de los enemigos que fueron destruidos
 		enemigosMuertosIndex = new Array();
 		
-		//Se revisan las fuentes embebidas
-		
-		
+		//Musica
 		sonidoMusicaEnemigos = new FlxSound();
 		sonidoMusicaEnemigos = Sounds.sonEneUno;
 		
-		//vidasSprite = new Nave(128, 3);
-		//add(vidasSprite);
-		
-		//Aca se agregar los scores a la pantalla. Revisar comentarios en AddScores()
-		AddScores();
 	}
+	
+	/*<<<<<<<<<<UPDATE>>>>>>>>>>>*/
 
 	override public function update(elapsed:Float):Void
 	{
 		super.update(elapsed);
 		
-		ComprobarGano();
 		CambiarDireccionEnemigos();
 		ComprobarEnemigosColision(nave.disparo);
 		ComprobarColisionJugador();
 		RegularFramesEnemigos();
-		//ComprobarPerdio();
+		ComprobarPerdio();
 		Pausar();
 		MusicaEnemigos();
+		ComprobarGano();
+		if (nave.puedeDisparar)
+		{
+			hud.UpdateVidas();
+		}
 	}
 	
-	private function Reset():Void
+	
+	
+	
+	/*<<<<<<<<<COLISIONES>>>>>>>>>*/
+	
+	
+	
+	
+	//Para cualquier colision con un enemigo
+	private function ColisionEnemigo(disparo:Disparo, alien:Enemigo):Bool
 	{
-		Reg.contEnemigos = 0;
-		enemigos.destroy();
-		nave.DestruirTodo();
-		sonidoMusicaEnemigos.destroy();
-		nave.destroy();
-		timer.destroy();
-		FlxG.resetState();
+		if (disparo != null)
+		{
+			if (alien.murio == false)
+			{
+				if (FlxG.overlap(disparo, alien))
+				{
+					alien.animation.play("muerte", 1);
+					disparo.destroy();
+					nave.puedeDisparar = true;
+					alien.murio = true;
+					hud.UpdateScore(alien.puntaje);
+					Reg.framesVelocidadEnemigos -= Reg.aceleracionEnemigos;
+					alien.sonidoMuerte.play();
+					return true;
+				}	
+			}
+		}
+		
+		return false;
 	}
+	
+	//Para separar el proceso de comprobar si colisiono y la colision misma
+	private function ComprobarEnemigosColision(disparo:Disparo):Void
+	{
+		for (i in 0... enemigos.length)
+		{
+			if (ColisionEnemigo(disparo, enemigos.members[i]))
+			{
+				enemigosMuertosIndex.push(i);
+			}
+		}
+	}
+	
+	//Para cualquier colision contra el jugador
+	private function ColisionJugador(aliens:FlxTypedGroup<Enemigo>, jugador:Nave):Bool
+	{
+		
+			for (i in 0... aliens.length)
+			{
+				if (aliens.members[i].disparo != null)
+				{	
+					if (FlxG.overlap(aliens.members[i].disparo, jugador))
+					{
+						return true;
+					}
+					else if (FlxG.overlap(aliens.members[i], jugador))
+					{
+						Reg.perdio = true;
+						return true;
+					}
+				}
+			}	
+			
+			return false;
+	}
+	
+	
+	private function ComprobarColisionJugador():Void
+	{
+		if (ColisionJugador(enemigos, nave) && nave.murio == false)
+		{
+			nave.murio = true;
+			nave.Muerte();
+		}
+	}
+	
+	/*<<<<<<<<<<<<CAMBIOS DE STATES>>>>>>>>>>>>>>>*/
 	
 	private function ComprobarGano():Void
 	{
-		if (gano)
-		{	
-			gano = false;
-			Reg.pausa = false;
-			openSubState(new PauseState());
-			Reset();
+		if (Reg.contEnemigos == Reg.cantidadEnemigos)
+		{
+			Reg.gano = true;
+		}
+		
+		if (Reg.gano)
+		{
+			FlxG.switchState(new ResultState());
 		}
 	}
 	
@@ -124,44 +196,29 @@ class PlayState extends FlxState
 			if (FlxG.keys.justPressed.ENTER)
 			{
 				Reg.pausa = true;
-				openSubState(new PauseState());
 			}
 		}
-	}
-	
-	private function AddScores():Void
-	{
-		/*
-		 Hay una clase Fonts para fuentes embebidas. Es estatica y publica y sus atributos y metodos tambien lo son
-		 pixeledFont es la variable de tipo String que contiene la direccion al archivo de la fuente.
-		 llamar escribiendo Fonts.pixeledFont
-		 
-		 
-		 Hay dos variables para el score en la clase estatica Reg:
-		 
-		 score:Int = 0
-		 highScore:Int = 0
-		 
-		 para actualizar el score, el mejor metodo seria utilizar una string con el texto "score: " (texto:String = "score: ") y que a la vez tenga sumado-
-		 el numero del score (texto:String = "score: " + Reg.score)
-		 
-		 De esta manera se puede actualizar el numero del score en cualquier momento y lugar y no enloquecerse con la string del score.
-		 
-		*/
-		 
-		/*
-		 Esta funcion es privada y esta exclusivamente para agregar los scores al PlayState
-		 Para actualizar los scores conviene utilizar un metodo dedicado a eso
-		 */
+		
+		if (Reg.pausa == true)
+		{
+			openSubState(new PauseState());
+		}
 	}
 	
 	private function ComprobarPerdio():Void
 	{
-		if (perdio)
+		if (Reg.vidas == 0)
 		{
-			//pasa algo
+			Reg.perdio = true;
+		}
+		
+		if (Reg.perdio)
+		{
+			FlxG.switchState(new ResultState());
 		}
 	}
+	
+	/*<<<<<<<<<<<<<METODOS PARA ENEMIGOS>>>>>>>>>>>>>>>>>>*/
 	
 	private function InitEnemigos():Void
 	{
@@ -207,72 +264,7 @@ class PlayState extends FlxState
 		}
 	}
 	
-	//Para cualquier colision con un enemigo
-	private function ColisionEnemigo(disparo:Disparo, alien:Enemigo):Bool
-	{
-		if (disparo != null)
-		{
-			if (alien.murio == false)
-			{
-				if (FlxG.overlap(disparo, alien))
-				{
-					alien.animation.play("muerte", 1);
-					disparo.destroy();
-					nave.puedeDisparar = true;
-					alien.murio = true;
-					Reg.framesVelocidadEnemigos -= Reg.aceleracionEnemigos;
-					alien.sonidoMuerte.play();
-					return true;
-				}	
-			}
-		}
-		
-		return false;
-	}
 	
-	//Para separar el proceso de comprobar si colisiono y la colision misma
-	private function ComprobarEnemigosColision(disparo:Disparo):Void
-	{
-		for (i in 0... enemigos.length)
-		{
-			if (ColisionEnemigo(disparo, enemigos.members[i]))
-			{
-				enemigosMuertosIndex.push(i);
-			}
-		}
-	}
-	
-	//Para cualquier colision contra el jugador
-	private function ColisionJugador(aliens:FlxTypedGroup<Enemigo>, jugador:Nave):Bool
-	{
-		
-			for (i in 0... aliens.length)
-			{
-				if (aliens.members[i].disparo != null)
-				{	
-					if (FlxG.overlap(aliens.members[i].disparo, jugador))
-					{
-						return true;
-					}
-					else if (FlxG.overlap(aliens.members[i], jugador))
-					{
-						perdio = true;
-						return true;
-					}
-				}
-			}	
-			
-			return false;
-	}
-	
-	
-	private function ComprobarColisionJugador():Void
-	{
-		if (ColisionJugador(enemigos, nave))
-		{
-			nave.Muerte();
-		}
-	}
 	
 	//Este metodo hace que los enemigos cambien su sentido y bajen hacia el jugador
 	private function CambiarDireccionEnemigos():Void
@@ -325,7 +317,7 @@ class PlayState extends FlxState
 			
 			if (Reg.contEnemigos == Reg.cantidadEnemigos)
 			{
-				gano = true;
+				break;
 			}
 		}
 		

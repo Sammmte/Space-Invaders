@@ -24,8 +24,9 @@ class Enemigo extends FlxSprite
 	public var sonidoMuerte:FlxSound;
 	
 	
-	//Tipo 1: 30 puntos , Tipo 2: 20 , Tipo 3: 10 , Tipo 4: Random
+	//Tipo 1: 10 puntos , Tipo 2: 20 , Tipo 3: 30 , Tipo 4: Random
 	public var tipo:Int = 0;
+	public var puntaje:Int;
 	
 	public function new(?X:Float=0, ?Y:Float=0, ?SimpleGraphic:FlxGraphicAsset) 
 	{
@@ -52,17 +53,7 @@ class Enemigo extends FlxSprite
 		timer.time = Reg.framesVelocidadEnemigos;
 	}
 	
-	private function ComprobarDisparoY():Void
-	{
-		if (!puedeDisparar && disparo != null)
-		{
-			if (disparo.IsOutStage())
-			{
-				puedeDisparar = true;
-				disparo.destroy();
-			}
-		}
-	}
+	/*<<<<<<<<<<<<INICIALIZACION>>>>>>>>>>>>>>*/
 	
 	public function CargarSprite():Void
 	{
@@ -73,6 +64,7 @@ class Enemigo extends FlxSprite
 			animation.add("dos", [1], 0, false);
 			animation.add("muerte", [2], 0, false);
 			animation.play("uno");
+			puntaje = 30;
 		}
 		else if (tipo == 2)
 		{
@@ -81,6 +73,7 @@ class Enemigo extends FlxSprite
 			animation.add("dos", [1], 0, false);
 			animation.add("muerte", [2], 0, false);
 			animation.play("uno");
+			puntaje = 20;
 		}
 		else if (tipo == 1)
 		{
@@ -89,12 +82,15 @@ class Enemigo extends FlxSprite
 			animation.add("dos", [1], 0, false);
 			animation.add("muerte", [2], 0, false);
 			animation.play("uno");
+			puntaje = 10;
 		}
 		/*else if(tipo == 4)
 		{
 			...
 		}*/
 	}
+	
+	/*<<<<<<<<<<<<CONTROLES>>>>>>>>>>>>>>*/
 	
 	public function Disparar():Void
 	{
@@ -143,11 +139,25 @@ class Enemigo extends FlxSprite
 		}
 	}
 	
+	/*<<<<<<<<<<<<AUXILIARES>>>>>>>>>>>>>>*/
+	
 	private function Muerte():Void
 	{
 		timer.destroy();
 		Reg.contEnemigos++;
 		destroy();
+	}
+	
+	private function ComprobarDisparoY():Void
+	{
+		if (!puedeDisparar && disparo != null)
+		{
+			if (disparo.IsOutStage())
+			{
+				puedeDisparar = true;
+				disparo.destroy();
+			}
+		}
 	}
 	
 	
