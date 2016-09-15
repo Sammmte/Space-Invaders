@@ -37,6 +37,10 @@ class MenuState extends FlxState
 		text.alpha = 0;
 		text.font = Fonts.pixeledFont;
 		
+		titulo = new FlxSprite(10, 200);
+		titulo.loadGraphic(Assets.getBitmapData("assets/images/titulo.png"));
+		
+		add(titulo);
 		add(text);
 		add(splashScreen);
 	}
@@ -80,10 +84,18 @@ class MenuState extends FlxState
 	
 	private function Menu():Void
 	{
-		text.alpha += 0.015;
-		if (FlxG.keys.justPressed.ENTER)
+		
+		if (titulo.y <= 5)
 		{
-			FlxG.switchState(new ResultState());
+			text.alpha += 0.015;
+			if (FlxG.keys.justPressed.ENTER)
+			{
+				FlxG.switchState(new ResultState());
+			}
+		}
+		else
+		{
+			titulo.y -= 0.7;
 		}
 	}
 }

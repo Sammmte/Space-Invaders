@@ -369,28 +369,28 @@ class PlayState extends FlxState
 		for (i in 0... enemigos.length)
 		{
 			
-				if (enemigos.members[i].x == Reg.rightXLimit + 6)
+				if (enemigos.members[i].x == Reg.rightXLimit + 6 && !direccionIzqEnemigos)
 				{
-					trace("Chota");
 					for (j in 0... enemigos.length)
 					{
 						
 						enemigos.members[j].direccion = -1;
-						enemigos.members[j].auxY = Reg.YBajadaEnemigos;
+						enemigos.members[j].y += Reg.YBajadaEnemigos;
 						
 					}
+					direccionIzqEnemigos = true;
 					break;
 				}
-				if (enemigos.members[i].x == Reg.leftXLimit + 4)
+				if (enemigos.members[i].x == Reg.leftXLimit + 4 && direccionIzqEnemigos)
 				{
-					trace("Chota");
 					for (j in 0... enemigos.length)
 					{
 						
 						enemigos.members[j].direccion = 1;
-						enemigos.members[j].auxY = Reg.YBajadaEnemigos;
+						enemigos.members[j].y += Reg.YBajadaEnemigos;
 						
 					}
+					direccionIzqEnemigos = false;
 					break;
 				}	
 			

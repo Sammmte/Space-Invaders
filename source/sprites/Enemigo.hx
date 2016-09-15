@@ -134,13 +134,7 @@ class Enemigo extends FlxSprite
 	
 	private function MoverPersonaje():Void
 	{
-		y += auxY;
 		x += direccion;
-		
-		if (auxY != 0)
-		{
-			auxY = 0;
-		}
 		
 		if (animation.name == "uno")
 		{
