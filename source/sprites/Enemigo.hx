@@ -84,10 +84,14 @@ class Enemigo extends FlxSprite
 			animation.play("uno");
 			puntaje = 10;
 		}
-		/*else if(tipo == 4)
+		else if(tipo == 4)
 		{
-			...
-		}*/
+			loadGraphic(AssetPaths.ovniprov__png, true, 16, 7);
+			animation.add("normal", [0], 0, false);
+			animation.add("muerte", [1], 0, false);
+			animation.play("normal");
+			puntaje = Reg.random.int(50, 100);
+		}
 	}
 	
 	/*<<<<<<<<<<<<CONTROLES>>>>>>>>>>>>>>*/
@@ -98,6 +102,11 @@ class Enemigo extends FlxSprite
 		disparo.x = (x + width/2) - disparo.width/2;
 		disparo.y = y + height;
 		disparo.velocity.y = Reg.disparoVelocityEnemy;
+		
+		if (tipo == 4)
+		{
+			disparo.velocity.y = Reg.disparoVelocityEnemy + 80;
+		}
 		
 		puedeDisparar = false;
 		
@@ -110,8 +119,12 @@ class Enemigo extends FlxSprite
 	{
 		if (!Reg.pausa)
 		{
-			Reg.musicaEnemigos = true;
+			if (!Reg.musicaOvni)
+			{
+				Reg.musicaEnemigos = true;
+			}
 			MoverPersonaje();
+			
 			if (murio)
 			{
 				Muerte();
@@ -159,7 +172,5 @@ class Enemigo extends FlxSprite
 			}
 		}
 	}
-	
-	
 	
 }

@@ -11,6 +11,7 @@ import flixel.math.FlxMath;
 import lime.graphics.Image;
 import sprites.Disparo;
 import sprites.Enemigo;
+import sprites.Estructura;
 import sprites.HUD;
 import sprites.Nave;
 import Reg;
@@ -18,6 +19,7 @@ import Fonts;
 import Sounds;
 import flixel.group.FlxGroup;
 import flixel.util.FlxTimer;
+import sprites.Ovni;
 import states.PauseState;
 import states.ResultState;
 import flixel.system.FlxAssets.FlxGraphicAsset;
@@ -29,6 +31,8 @@ class PlayState extends FlxState
 	private var hud:HUD;
 	private var nave:Nave;
 	private var enemigos:FlxTypedGroup<Enemigo>;
+	private var ovniBonus:Ovni;
+	private var estructuras:FlxTypedGroup<Estructura>;
 	
 	//Auxiliar
 	private var direccionIzqEnemigos:Bool = false;
@@ -36,7 +40,6 @@ class PlayState extends FlxState
 	private var enemigosMuertosIndex:Array<Int>;
 	private var sonidoMusicaEnemigos:FlxSound;
 	private var vidasSprite:Nave;
-	
 	
 	override public function create():Void
 	{
@@ -59,9 +62,12 @@ class PlayState extends FlxState
 		//Inicializar la posicion de los enemigos
 		InitEnemigos();
 		
+		//Inicializar la posicion de las estructuras colisionables
+		InitEstructuras();
+		
 		//Reseteo las posiciones por default de la clase Enemigo
 		Reg.xComienzoEnemigos = 15;
-		Reg.yComienzoEnemigos = 15;
+		Reg.yComienzoEnemigos = 25;
 		
 		//Timer auxiliar para manejar el momento en que uno miembro del grupo de enemigos debe disparar
 		timer = new FlxTimer();
@@ -83,14 +89,27 @@ class PlayState extends FlxState
 	{
 		super.update(elapsed);
 		
+		//Cambia el sentido de los enemigos
 		CambiarDireccionEnemigos();
+		//Colisiones
 		ComprobarEnemigosColision(nave.disparo);
-		ComprobarColisionJugador();
+		
+		ComprobarColisionJugador(enemigos, ovniBonus, nave);
+		
+		ColisionEstructura();
+		
+		ColisionEnemigo(nave.disparo, ovniBonus);
+		
+		//Auxiliares
+		SpawnOvni();
 		RegularFramesEnemigos();
+		MusicaEnemigos();
+		
+		//Cambios de States
 		ComprobarPerdio();
 		Pausar();
-		MusicaEnemigos();
 		ComprobarGano();
+		
 		if (nave.puedeDisparar)
 		{
 			hud.UpdateVidas();
@@ -98,17 +117,87 @@ class PlayState extends FlxState
 	}
 	
 	
+	/*<<<<<<<<<ESTRUCTURAS COLISIONABLES>>>>>>>>>*/
 	
+	
+	private function InitEstructuras():Void
+	{
+		estructuras = new FlxTypedGroup<Estructura>(Reg.cantidadEstructuras);
+		
+		var strX:Int = 20;
+		var aux:Int = 33;
+		
+		for (i in 0... Reg.cantidadEstructuras)
+		{
+			var estructura = new Estructura(strX, Reg.yEstructuras);
+			strX += aux;
+			estructuras.add(estructura);
+		}
+		
+		add(estructuras);
+	}
 	
 	/*<<<<<<<<<COLISIONES>>>>>>>>>*/
 	
-	
+	//Colision contra estructuras
+	private function ColisionEstructura():Void
+	{
+		if (nave.disparo != null)
+		{
+			for (i in 0... estructuras.length)
+			{
+				if (FlxG.overlap(estructuras.members[i], nave.disparo))
+				{
+					estructuras.members[i].CambiarAnimacion();
+					nave.disparo.destroy();
+					nave.puedeDisparar = true;
+				}
+			}
+		}
+		
+		for (i in 0... enemigos.length)
+		{
+			if (enemigos.members[i].disparo != null)
+			{
+				for (j in 0... estructuras.length)
+				{
+					if (FlxG.overlap(estructuras.members[j], enemigos.members[i].disparo))
+					{
+						estructuras.members[j].CambiarAnimacion();
+						enemigos.members[i].disparo.destroy();
+						enemigos.members[i].puedeDisparar = true;
+					}
+					
+					if (FlxG.overlap(estructuras.members[j], enemigos.members[i]))
+					{
+						estructuras.members[j].CambiarAnimacion();
+					}
+				}
+			}
+		}
+		
+		if (ovniBonus != null)
+		{
+			if (ovniBonus.disparo != null)
+			{
+				for (i in 0... estructuras.length)
+				{
+					if (FlxG.overlap(estructuras.members[i], ovniBonus.disparo))
+					{
+						estructuras.members[i].CambiarAnimacion();
+						ovniBonus.disparo.destroy();
+						ovniBonus.puedeDisparar = true;
+					}
+				}
+			}
+		}
+	}
 	
 	
 	//Para cualquier colision con un enemigo
 	private function ColisionEnemigo(disparo:Disparo, alien:Enemigo):Bool
 	{
-		if (disparo != null)
+		if (disparo != null && alien != null)
 		{
 			if (alien.murio == false)
 			{
@@ -142,7 +231,7 @@ class PlayState extends FlxState
 	}
 	
 	//Para cualquier colision contra el jugador
-	private function ColisionJugador(aliens:FlxTypedGroup<Enemigo>, jugador:Nave):Bool
+	private function ColisionJugador(aliens:FlxTypedGroup<Enemigo>, enemigo:Ovni, jugador:Nave):Bool
 	{
 		
 			for (i in 0... aliens.length)
@@ -161,13 +250,21 @@ class PlayState extends FlxState
 				}
 			}	
 			
+			if (enemigo != null && enemigo.disparo != null)
+			{
+				if (FlxG.overlap(enemigo.disparo, jugador))
+				{
+					return true;
+				}
+			}
+			
 			return false;
 	}
 	
 	
-	private function ComprobarColisionJugador():Void
+	private function ComprobarColisionJugador(aliens:FlxTypedGroup<Enemigo>, enemigo:Ovni, jugador:Nave):Void
 	{
-		if (ColisionJugador(enemigos, nave) && nave.murio == false)
+		if (ColisionJugador(aliens, enemigo, jugador) && nave.murio == false)
 		{
 			nave.murio = true;
 			nave.Muerte();
@@ -245,9 +342,9 @@ class PlayState extends FlxState
 					enemigo.CargarSprite();
 				}
 				enemigos.add(enemigo);
-				Reg.xComienzoEnemigos += Reg.espacioEntreEnemigos;
+				Reg.xComienzoEnemigos += Reg.espacioEntreEnemigosX;
 			}
-			Reg.yComienzoEnemigos += Reg.espacioEntreEnemigos;
+			Reg.yComienzoEnemigos += Reg.espacioEntreEnemigosY;
 			Reg.xComienzoEnemigos = 14;
 		}
 		
@@ -274,6 +371,7 @@ class PlayState extends FlxState
 			
 				if (enemigos.members[i].x == Reg.rightXLimit + 6)
 				{
+					trace("Chota");
 					for (j in 0... enemigos.length)
 					{
 						
@@ -285,6 +383,7 @@ class PlayState extends FlxState
 				}
 				if (enemigos.members[i].x == Reg.leftXLimit + 4)
 				{
+					trace("Chota");
 					for (j in 0... enemigos.length)
 					{
 						
@@ -304,6 +403,8 @@ class PlayState extends FlxState
 		{
 			EnemigoRandomDispara();
 		}
+		
+		Reg.spawnOvniTime++;
 	}
 	
 	//Metodo para hacer disparar a los enemigos
@@ -343,7 +444,7 @@ class PlayState extends FlxState
 	
 	private function MusicaEnemigos():Void
 	{
-		if (Reg.musicaEnemigos)
+		if (Reg.musicaEnemigos && !Reg.musicaOvni)
 		{
 			sonidoMusicaEnemigos.play();
 			Reg.musicaEnemigos = false;
@@ -363,6 +464,31 @@ class PlayState extends FlxState
 			else if (sonidoMusicaEnemigos == Sounds.sonEneCuatro)
 			{
 				sonidoMusicaEnemigos = Sounds.sonEneUno;
+			}
+		}
+		
+		if (Reg.musicaOvni)
+		{
+			sonidoMusicaEnemigos = Sounds.sonEneUno;
+		}
+	}
+	
+	private function SpawnOvni():Void
+	{
+		if (Reg.spawnOvniTime % 23 == 0)
+		{
+			ovniBonus = new Ovni(Reg.xComienzoOvni, Reg.yComienzoOvni);
+			ovniBonus.tipo = 4;
+			ovniBonus.CargarSprite();
+			add(ovniBonus);
+			Reg.spawnOvniTime++;
+			
+			Reg.musicaEnemigos = false;
+			Reg.musicaOvni = true;
+			
+			if (Reg.spawnOvniTime == 100)
+			{
+				Reg.spawnOvniTime = 1;
 			}
 		}
 	}
