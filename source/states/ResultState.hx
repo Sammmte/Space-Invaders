@@ -72,20 +72,24 @@ class ResultState extends FlxState
 			Reg.resets++;
 			Reg.gano = false;
 			Reg.contEnemigos = 0;
+			Reg.spawnOvniTime = 1;
+			Reg.musicaEnemigos = true;
+			Reg.musicaOvni = false;
 			
-			text.text = "PLAY\n\n  SPACE       INVADERS\n\nSCORE  ADVANCE  TABLE\n\n     = ? MYSTERY\n    = 30 POINTS\n    = 20 POINTS\n    = 10 POINTS";
+			EntrePantalla();
 		}
 		else if (Reg.perdio)
 		{
-			
-			text.text = "\n\n\n\n\n\nPerdiste";
+			text.text = "\n\n\n\n\n\nYOU LOSE\n\nSCORE = " + Reg.score + "\n\nHIGHSCORE = " + Reg.highScore;
 			Reg.vidas = 3;
 			Reg.resets = 1;			
 			Reg.gano = false;
 			Reg.contEnemigos = 0;
 			Reg.aceleracionEnemigos = 0.014;
 			Reg.score = 0;
-			Reg.spawnOvniTime = 0;
+			Reg.spawnOvniTime = 1;
+			Reg.musicaEnemigos = true;
+			Reg.musicaOvni = false;
 		}
 		else if (!Reg.gano && !Reg.perdio)
 		{
@@ -95,7 +99,7 @@ class ResultState extends FlxState
 	
 	private function EntrePantalla():Void
 	{
-		text.text = "PLAY\n\n  SPACE       INVADERS\n\nSCORE  ADVANCE  TABLE\n\n     = ? MYSTERY\n    = 30 POINTS\n    = 20 POINTS\n    = 10 POINTS";
+		text.text = "PLAY\n\n  SPACE       INVADERS\n\nSCORE  ADVANCE  TABLE\n\n     = ? MYSTERY\n    = 30 POINTS\n    = 20 POINTS\n    = 10 POINTS\n\nPRESS X TO SHOOT";
 	}
 	
 	private function DestruirTodo(timer:FlxTimer):Void

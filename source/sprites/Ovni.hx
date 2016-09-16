@@ -60,7 +60,6 @@ class Ovni extends Enemigo
 	
 	override public function Muerte():Void
 	{
-		trace("hola");
 		FlxG.state.remove(this);
 		murio = false;
 		puedeDisparar = false;

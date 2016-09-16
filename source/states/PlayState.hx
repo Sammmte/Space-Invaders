@@ -6,7 +6,6 @@ import flixel.FlxState;
 import flixel.math.FlxRandom;
 import flixel.system.FlxSound;
 import flixel.text.FlxText;
-import flixel.ui.FlxButton;
 import flixel.math.FlxMath;
 import lime.graphics.Image;
 import sprites.Disparo;
@@ -53,7 +52,7 @@ class PlayState extends FlxState
 		//Random estatico para cualquier necesidad
 		Reg.random = new FlxRandom();
 		
-		Reg.aceleracionEnemigos += Reg.aumentoAceleracion;
+		//Reg.aceleracionEnemigos += Reg.aumentoAceleracion;
 		Reg.framesVelocidadEnemigos = 1;
 		
 		nave = new Nave(Reg.playerX, Reg.playerY);
@@ -203,7 +202,7 @@ class PlayState extends FlxState
 			{
 				if (FlxG.overlap(disparo, alien))
 				{
-					alien.animation.play("muerte", 1);
+					alien.animation.play("muerte", false, false, 1);
 					disparo.destroy();
 					nave.puedeDisparar = true;
 					alien.murio = true;
@@ -282,6 +281,7 @@ class PlayState extends FlxState
 		
 		if (Reg.gano)
 		{
+			DestruirTodo();
 			FlxG.switchState(new ResultState());
 		}
 	}
@@ -311,6 +311,7 @@ class PlayState extends FlxState
 		
 		if (Reg.perdio)
 		{
+			DestruirTodo();
 			FlxG.switchState(new ResultState());
 		}
 	}
@@ -354,10 +355,13 @@ class PlayState extends FlxState
 	//Este metodo evita que el timer que usan los enemigos se detenga y el grupo entero se trabe
 	private function RegularFramesEnemigos():Void
 	{
-		if (Reg.framesVelocidadEnemigos <= Reg.aceleracionEnemigos + 0.001)
+		if (Reg.framesVelocidadEnemigos != 0.021)
 		{
-			Reg.aceleracionEnemigos = 0.02;
-			Reg.framesVelocidadEnemigos = 0.021;
+				if (Reg.framesVelocidadEnemigos <= Reg.aceleracionEnemigos + 0.001)
+			{
+				Reg.aceleracionEnemigos = 0.02;
+				Reg.framesVelocidadEnemigos = 0.021;
+			}
 		}
 	}
 	
@@ -371,14 +375,17 @@ class PlayState extends FlxState
 			
 				if (enemigos.members[i].x == Reg.rightXLimit + 6 && !direccionIzqEnemigos)
 				{
+					
 					for (j in 0... enemigos.length)
 					{
-						
 						enemigos.members[j].direccion = -1;
-						enemigos.members[j].y += Reg.YBajadaEnemigos;
-						
 					}
 					direccionIzqEnemigos = true;
+					for (j in 0... enemigos.length)
+					{
+						enemigos.members[j].y += Reg.YBajadaEnemigos;
+					}
+					
 					break;
 				}
 				if (enemigos.members[i].x == Reg.leftXLimit + 4 && direccionIzqEnemigos)
@@ -387,10 +394,14 @@ class PlayState extends FlxState
 					{
 						
 						enemigos.members[j].direccion = 1;
-						enemigos.members[j].y += Reg.YBajadaEnemigos;
 						
 					}
 					direccionIzqEnemigos = false;
+					for (j in 0... enemigos.length)
+					{
+						enemigos.members[j].y += Reg.YBajadaEnemigos;
+					}
+					
 					break;
 				}	
 			
@@ -490,6 +501,19 @@ class PlayState extends FlxState
 			{
 				Reg.spawnOvniTime = 1;
 			}
+		}
+	}
+	
+	private function DestruirTodo():Void
+	{
+		hud.destroy();
+		nave.destroy();
+		timer.destroy();
+		enemigos.destroy();
+		estructuras.destroy();
+		if (ovniBonus != null)
+		{
+			ovniBonus.destroy();
 		}
 	}
 }
