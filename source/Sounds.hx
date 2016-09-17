@@ -25,6 +25,21 @@ class Sounds
 	
 	static public function Init():Void
 	{
+		#if web
+		sonEneUno = FlxG.sound.load(AssetPaths.sonEne1__ogg, 1, false);
+		sonEneDos = FlxG.sound.load(AssetPaths.sonEne2__ogg, 1,false);
+		sonEneTres = FlxG.sound.load(AssetPaths.sonEne3__ogg, 1,false);
+		sonEneCuatro = FlxG.sound.load(AssetPaths.sonEne4__ogg, 1,false);
+		muerteNave = FlxG.sound.load(AssetPaths.explosion__ogg, 1,false);
+		muerteEnemigo = FlxG.sound.load(AssetPaths.invaderkilled__ogg, 1,false);
+		disparo = FlxG.sound.load(AssetPaths.shoot__ogg, 1,false);
+		sonidoOvni = FlxG.sound.load(AssetPaths.ufo__ogg, 1, true);
+		sonidoPausa = FlxG.sound.load(AssetPaths.pausa__ogg, 1, false);
+		sonidoOhYes = FlxG.sound.load(AssetPaths.ohyes__ogg, 1, false);
+		sonidoSeleccion = FlxG.sound.load(AssetPaths.seleccion__ogg, 1, false);
+		#end
+		
+		#if desktop
 		sonEneUno = FlxG.sound.load(AssetPaths.sonEne1__wav, 1, false);
 		sonEneDos = FlxG.sound.load(AssetPaths.sonEne2__wav, 1,false);
 		sonEneTres = FlxG.sound.load(AssetPaths.sonEne3__wav, 1,false);
@@ -36,6 +51,7 @@ class Sounds
 		sonidoPausa = FlxG.sound.load(AssetPaths.pausa__wav, 1, false);
 		sonidoOhYes = FlxG.sound.load(AssetPaths.ohyes__wav, 1, false);
 		sonidoSeleccion = FlxG.sound.load(AssetPaths.seleccion__wav, 1, false);
+		#end
 	}
 	
 	public function new() 

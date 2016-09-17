@@ -29,6 +29,12 @@ class Ovni extends Enemigo
 		ComprobarDisparoY();
 		MoverPersonaje();
 		
+		if (!sonido.playing)
+		{
+			sonido.play();
+		}
+		
+		
 		if (x <= -width)
 		{
 			Muerte();
@@ -37,7 +43,7 @@ class Ovni extends Enemigo
 	
 	override private function OnComplete(timer:FlxTimer):Void
 	{
-		if (!Reg.gano || !Reg.perdio)
+		if ((!Reg.gano || !Reg.perdio) && !Reg.pausa)
 		{
 			if ((Reg.random.int(1, 100) % 5 == 0) && !murio && puedeDisparar)
 			{

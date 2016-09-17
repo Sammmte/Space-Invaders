@@ -326,6 +326,7 @@ class PlayState extends FlxState
 			if (FlxG.keys.justPressed.ENTER)
 			{
 				Reg.pausa = true;
+				ovniBonus.sonido.stop();
 			}
 		}
 		
@@ -444,9 +445,8 @@ class PlayState extends FlxState
 		if (Reg.pausa == false)
 		{
 			EnemigoRandomDispara();
+			Reg.spawnOvniTime++;
 		}
-		
-		Reg.spawnOvniTime++;
 	}
 	
 	//Metodo para hacer disparar a los enemigos
