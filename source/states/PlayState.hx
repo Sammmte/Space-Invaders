@@ -39,6 +39,7 @@ class PlayState extends FlxState
 	private var enemigosMuertosIndex:Array<Int>;
 	private var sonidoMusicaEnemigos:FlxSound;
 	private var vidasSprite:Nave;
+	private var limite:Int;
 	
 	override public function create():Void
 	{
@@ -81,6 +82,8 @@ class PlayState extends FlxState
 		//Musica
 		sonidoMusicaEnemigos = new FlxSound();
 		sonidoMusicaEnemigos = Sounds.sonEneUno;
+		
+		limite = Reg.rightXLimit + 6;
 		
 	}
 	
@@ -407,14 +410,22 @@ class PlayState extends FlxState
 		for (i in 0... enemigos.length)
 		{
 			
-				if (enemigos.members[i].x >= Reg.rightXLimit + 6)
+				if (enemigos.members[i].x >= limite)
 				{
+					trace("hola");
+					trace(limite);
+					trace(enemigos.members[i].x);
 					enemigos.forEachAlive(CambiarDireccion);
+					limite = Reg.leftXLimit + 4;
 					break;
 				}
-				if (enemigos.members[i].x <= Reg.leftXLimit + 4)
+				if (enemigos.members[i].x <= limite)
 				{
+					trace("chota");
+					trace(limite);
+					trace(enemigos.members[i].x);
 					enemigos.forEachAlive(CambiarDireccion);
+					limite = Reg.rightXLimit + 6;
 					break;
 				}	
 			
