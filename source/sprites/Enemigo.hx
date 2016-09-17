@@ -22,6 +22,7 @@ class Enemigo extends FlxSprite
 	public var murio:Bool = false;
 	public var trick:Bool = false;
 	public var sonidoMuerte:FlxSound;
+	public var puedeBajar = true;
 	
 	
 	//Tipo 1: 10 puntos , Tipo 2: 20 , Tipo 3: 30 , Tipo 4: Random
@@ -90,7 +91,8 @@ class Enemigo extends FlxSprite
 			animation.add("normal", [0], 0, false);
 			animation.add("muerte", [1], 0, false);
 			animation.play("normal");
-			puntaje = Reg.random.int(50, 100);
+			var aux = Reg.random.int(50, 100);
+			puntaje = aux - (aux % 10);
 		}
 	}
 	
@@ -105,7 +107,7 @@ class Enemigo extends FlxSprite
 		
 		if (tipo == 4)
 		{
-			disparo.velocity.y = Reg.disparoVelocityEnemy + 80;
+			disparo.velocity.y = Reg.disparoVelocityEnemy + 30;
 		}
 		
 		puedeDisparar = false;
@@ -119,10 +121,13 @@ class Enemigo extends FlxSprite
 	{
 		if (!Reg.pausa)
 		{
+			puedeBajar = true;
+			
 			if (!Reg.musicaOvni)
 			{
 				Reg.musicaEnemigos = true;
 			}
+			
 			MoverPersonaje();
 			
 			if (murio)

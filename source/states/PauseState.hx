@@ -20,6 +20,8 @@ class PauseState extends FlxSubState
 	{
 		super(BGColor);
 		
+		FlxG.mouse.visible = false;
+		
 		Sounds.Init();
 		
 		sonido = new FlxSound();

@@ -1,4 +1,4 @@
-package source.states;
+package states;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -8,7 +8,6 @@ import flixel.text.FlxText;
 import flixel.ui.FlxButton;
 import flixel.math.FlxMath;
 import states.ResultState;
-import openfl.Assets;
 import flixel.util.FlxColor;
 import Fonts;
 import Sounds;
@@ -26,12 +25,14 @@ class MenuState extends FlxState
 	override public function create():Void
 	{
 		super.create();
+	
+		FlxG.mouse.visible = false;
 		
 		Fonts.Init();
 		Sounds.Init();
 		
 		splashScreen = new FlxSprite(0, 0);
-		splashScreen.loadGraphic(Assets.getBitmapData("assets/images/splash.jpeg"));
+		splashScreen.loadGraphic(AssetPaths.splash__jpeg);
 		splashScreen.alpha = 0;
 		
 		text = new FlxText(3, 70);
@@ -43,7 +44,7 @@ class MenuState extends FlxState
 		text.font = Fonts.pixeledFont;
 		
 		titulo = new FlxSprite(10, 200);
-		titulo.loadGraphic(Assets.getBitmapData("assets/images/titulo.png"));
+		titulo.loadGraphic(AssetPaths.titulo__png);
 		
 		sonidoOhYes = Sounds.sonidoOhYes;
 		sonidoOhYes.onComplete = PresentacionTrue;

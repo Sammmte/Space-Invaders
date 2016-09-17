@@ -48,6 +48,7 @@ class Nave extends FlxSprite
 	{
 		if (disparo != null)
 		{
+			FlxG.state.remove(disparo);
 			disparo.destroy();
 		}
 		

@@ -32,7 +32,7 @@ class Reg
 	static public var aceleracionEnemigos:Float = 0.014;
 	static public var perdio:Bool = false;
 	static public var gano:Bool = false;
-	static public var vidas:Int = 80;
+	static public var vidas:Int = 3;
 	static public var score:Int = 0;
 	static public var highScore:Int = 0;
 	static public var cantidadEstructuras:Int = 4;

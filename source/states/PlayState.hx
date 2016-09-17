@@ -1,4 +1,4 @@
-package source.states;
+package states;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -34,7 +34,7 @@ class PlayState extends FlxState
 	private var estructuras:FlxTypedGroup<Estructura>;
 	
 	//Auxiliar
-	private var direccionIzqEnemigos:Bool = false;
+	//private var direccionIzqEnemigos:Bool = false;
 	private var timer:FlxTimer;
 	private var enemigosMuertosIndex:Array<Int>;
 	private var sonidoMusicaEnemigos:FlxSound;
@@ -43,6 +43,8 @@ class PlayState extends FlxState
 	override public function create():Void
 	{
 		super.create();
+		
+		FlxG.mouse.visible = false;
 		
 		Fonts.Init();
 		Sounds.Init();
@@ -99,6 +101,8 @@ class PlayState extends FlxState
 		
 		ColisionEnemigo(nave.disparo, ovniBonus);
 		
+		ColisionBalas();
+		
 		//Auxiliares
 		SpawnOvni();
 		RegularFramesEnemigos();
@@ -137,6 +141,35 @@ class PlayState extends FlxState
 	}
 	
 	/*<<<<<<<<<COLISIONES>>>>>>>>>*/
+	
+	private function ColisionBalas():Void
+	{
+		for (i in 0... enemigos.length)
+		{
+			if (nave.disparo != null && enemigos.members[i].disparo != null)
+			{
+				if (FlxG.overlap(enemigos.members[i].disparo, nave.disparo))
+				{
+					enemigos.members[i].disparo.destroy();
+					nave.disparo.AnimacionDestruccion();
+					nave.puedeDisparar = true;
+					enemigos.members[i].puedeDisparar = true;
+				}
+			}
+		}
+		
+		if (nave.disparo != null && ovniBonus != null && ovniBonus.disparo != null)
+			{
+				if (FlxG.overlap(ovniBonus.disparo, nave.disparo))
+				{
+					ovniBonus.disparo.destroy();
+					nave.disparo.AnimacionDestruccion();
+					nave.puedeDisparar = true;
+					ovniBonus.puedeDisparar = true;
+				}
+			}
+	}
+	
 	
 	//Colision contra estructuras
 	private function ColisionEstructura():Void
@@ -373,39 +406,37 @@ class PlayState extends FlxState
 		for (i in 0... enemigos.length)
 		{
 			
-				if (enemigos.members[i].x == Reg.rightXLimit + 6 && !direccionIzqEnemigos)
+				if (enemigos.members[i].x >= Reg.rightXLimit + 6)
 				{
-					
-					for (j in 0... enemigos.length)
-					{
-						enemigos.members[j].direccion = -1;
-					}
-					direccionIzqEnemigos = true;
-					for (j in 0... enemigos.length)
-					{
-						enemigos.members[j].y += Reg.YBajadaEnemigos;
-					}
-					
+					enemigos.forEachAlive(CambiarDireccion);
 					break;
 				}
-				if (enemigos.members[i].x == Reg.leftXLimit + 4 && direccionIzqEnemigos)
+				if (enemigos.members[i].x <= Reg.leftXLimit + 4)
 				{
-					for (j in 0... enemigos.length)
-					{
-						
-						enemigos.members[j].direccion = 1;
-						
-					}
-					direccionIzqEnemigos = false;
-					for (j in 0... enemigos.length)
-					{
-						enemigos.members[j].y += Reg.YBajadaEnemigos;
-					}
-					
+					enemigos.forEachAlive(CambiarDireccion);
 					break;
 				}	
 			
 		}
+	}
+	
+	private function CambiarDireccion(e:Enemigo):Void
+	{
+		if (e.puedeBajar)
+		{
+			if (e.direccion == 1)
+			{
+				e.direccion = -1;
+			}
+			else
+			{
+				e.direccion = 1;
+			}
+			
+			e.y += Reg.YBajadaEnemigos;
+		}
+		
+		e.puedeBajar = false;
 	}
 	
 	private function OnComplete(timer:FlxTimer):Void
@@ -486,7 +517,7 @@ class PlayState extends FlxState
 	
 	private function SpawnOvni():Void
 	{
-		if (Reg.spawnOvniTime % 23 == 0)
+		if (Reg.spawnOvniTime % 10 == 0)
 		{
 			ovniBonus = new Ovni(Reg.xComienzoOvni, Reg.yComienzoOvni);
 			ovniBonus.tipo = 4;

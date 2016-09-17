@@ -7,9 +7,8 @@ import Reg;
 import Fonts;
 import flixel.util.FlxTimer;
 import flixel.FlxG;
-import source.states.MenuState;
-import source.states.PlayState;
-import openfl.Assets;
+import states.MenuState;
+import states.PlayState;
 
 /**
  * ...
@@ -30,6 +29,8 @@ class ResultState extends FlxState
 	{
 		super.create();
 		
+		FlxG.mouse.visible = false;
+		
 		text = new FlxText();
 		text.size = 8;
 		text.fieldWidth = 160;
@@ -44,10 +45,10 @@ class ResultState extends FlxState
 		spriteTres = new FlxSprite(x+3,y+22);
 		spriteCuatro = new FlxSprite(x+3,y+33);
 		
-		spriteUno.loadGraphic(Assets.getBitmapData("assets/images/ovni.png"));
-		spriteDos.loadGraphic(Assets.getBitmapData("assets/images/enemigo1.png"));
-		spriteTres.loadGraphic(Assets.getBitmapData("assets/images/enemigo3.png"));
-		spriteCuatro.loadGraphic(Assets.getBitmapData("assets/images/enemigo2.png"));
+		spriteUno.loadGraphic(AssetPaths.ovni__png);
+		spriteDos.loadGraphic(AssetPaths.enemigo1__png);
+		spriteTres.loadGraphic(AssetPaths.enemigo3__png);
+		spriteCuatro.loadGraphic(AssetPaths.enemigo2__png);
 	}
 	
 	private function OnComplete(timer:FlxTimer):Void
