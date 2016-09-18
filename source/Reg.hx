@@ -1,6 +1,7 @@
 package;
 import flixel.FlxSprite;
 import flixel.math.FlxRandom;
+import flixel.util.FlxTimer;
 
 /**
  * ...
@@ -41,7 +42,8 @@ class Reg
 	
 	inline static public var espacioEntreEnemigosX:Int = 15;
 	inline static public var espacioEntreEnemigosY:Int = 10;
-	inline static public var YBajadaEnemigos:Int = 4;
+	static public var YBajadaEnemigos:Int = 4;
+	//static public var timer:FlxTimer;
 	static public var enemigosDisparoDelay:Float = 2;
 	static public var contEnemigos:Int = 0;
 	static public var delayDeMuerte:Float = 2;

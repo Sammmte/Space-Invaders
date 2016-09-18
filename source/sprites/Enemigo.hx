@@ -134,6 +134,8 @@ class Enemigo extends FlxSprite
 			{
 				Muerte();
 			}
+			
+			Reg.YBajadaEnemigos = 4;
 		}
 	}
 	

@@ -7,7 +7,6 @@ import flixel.math.FlxRandom;
 import flixel.system.FlxSound;
 import flixel.text.FlxText;
 import flixel.math.FlxMath;
-import lime.graphics.Image;
 import sprites.Disparo;
 import sprites.Enemigo;
 import sprites.Estructura;
@@ -22,7 +21,6 @@ import sprites.Ovni;
 import states.PauseState;
 import states.ResultState;
 import flixel.system.FlxAssets.FlxGraphicAsset;
-import flixel.util.FlxColor;
 
 class PlayState extends FlxState
 {
@@ -34,11 +32,12 @@ class PlayState extends FlxState
 	private var estructuras:FlxTypedGroup<Estructura>;
 	
 	//Auxiliar
-	//private var direccionIzqEnemigos:Bool = false;
+	private var direccionIzqEnemigos:Bool = false;
 	private var timer:FlxTimer;
 	private var enemigosMuertosIndex:Array<Int>;
-	private var sonidoMusicaEnemigos:FlxSound;
 	private var vidasSprite:Nave;
+	private var limite:Int;
+	private var sonidoNum:Int = 1;
 	
 	override public function create():Void
 	{
@@ -54,7 +53,7 @@ class PlayState extends FlxState
 		//Random estatico para cualquier necesidad
 		Reg.random = new FlxRandom();
 		
-		//Reg.aceleracionEnemigos += Reg.aumentoAceleracion;
+		Reg.aceleracionEnemigos += Reg.aumentoAceleracion;
 		Reg.framesVelocidadEnemigos = 1;
 		
 		nave = new Nave(Reg.playerX, Reg.playerY);
@@ -78,9 +77,7 @@ class PlayState extends FlxState
 		//mediante el descarte de los enemigos que fueron destruidos
 		enemigosMuertosIndex = new Array();
 		
-		//Musica
-		sonidoMusicaEnemigos = new FlxSound();
-		sonidoMusicaEnemigos = Sounds.sonEneUno;
+		limite = Reg.rightXLimit + 6;
 		
 	}
 	
@@ -326,7 +323,10 @@ class PlayState extends FlxState
 			if (FlxG.keys.justPressed.ENTER)
 			{
 				Reg.pausa = true;
-				ovniBonus.sonido.stop();
+				if (ovniBonus != null && ovniBonus.sonido != null)
+				{
+					ovniBonus.sonido.stop();
+				}
 			}
 		}
 		
@@ -407,37 +407,30 @@ class PlayState extends FlxState
 		for (i in 0... enemigos.length)
 		{
 			
-				if (enemigos.members[i].x >= Reg.rightXLimit + 6)
+				if (enemigos.members[i].x >= limite && !direccionIzqEnemigos)
 				{
-					enemigos.forEachAlive(CambiarDireccion);
+					limite = Reg.leftXLimit + 4;
+					direccionIzqEnemigos = true;
+					enemigos.forEachAlive(BajarEnemigos);
+					Reg.YBajadaEnemigos = 0;
 					break;
 				}
-				if (enemigos.members[i].x <= Reg.leftXLimit + 4)
+				if (enemigos.members[i].x <= limite && direccionIzqEnemigos)
 				{
-					enemigos.forEachAlive(CambiarDireccion);
+					limite = Reg.rightXLimit + 6;
+					direccionIzqEnemigos = false;
+					enemigos.forEachAlive(BajarEnemigos);
+					Reg.YBajadaEnemigos = 0;
 					break;
 				}	
 			
 		}
 	}
 	
-	private function CambiarDireccion(e:Enemigo):Void
+	private function BajarEnemigos(e:Enemigo):Void
 	{
-		if (e.puedeBajar)
-		{
-			if (e.direccion == 1)
-			{
-				e.direccion = -1;
-			}
-			else
-			{
-				e.direccion = 1;
-			}
-			
-			e.y += Reg.YBajadaEnemigos;
-		}
-		
-		e.puedeBajar = false;
+		e.direccion *= -1;
+		e.y += Reg.YBajadaEnemigos;
 	}
 	
 	private function OnComplete(timer:FlxTimer):Void
@@ -488,36 +481,34 @@ class PlayState extends FlxState
 	{
 		if (Reg.musicaEnemigos && !Reg.musicaOvni)
 		{
-			sonidoMusicaEnemigos.play();
 			Reg.musicaEnemigos = false;
 			
-			if (sonidoMusicaEnemigos == Sounds.sonEneUno)
+			if (sonidoNum == 1)
 			{
-				sonidoMusicaEnemigos = Sounds.sonEneDos;
+				sonidoNum = 2;
+				Sounds.sonEneUno.play();
 			}
-			else if (sonidoMusicaEnemigos == Sounds.sonEneDos)
+			else if (sonidoNum == 2)
 			{
-				sonidoMusicaEnemigos = Sounds.sonEneTres;
+				sonidoNum = 3;
+				Sounds.sonEneDos.play();
 			}
-			else if (sonidoMusicaEnemigos == Sounds.sonEneTres)
+			else if (sonidoNum == 3)
 			{
-				sonidoMusicaEnemigos = Sounds.sonEneCuatro;
+				sonidoNum = 4;
+				Sounds.sonEneTres.play();
 			}
-			else if (sonidoMusicaEnemigos == Sounds.sonEneCuatro)
+			else if (sonidoNum == 4)
 			{
-				sonidoMusicaEnemigos = Sounds.sonEneUno;
+				sonidoNum = 1;
+				Sounds.sonEneCuatro.play();
 			}
-		}
-		
-		if (Reg.musicaOvni)
-		{
-			sonidoMusicaEnemigos = Sounds.sonEneUno;
 		}
 	}
 	
 	private function SpawnOvni():Void
 	{
-		if (Reg.spawnOvniTime % 10 == 0)
+		if (Reg.spawnOvniTime % 23 == 0)
 		{
 			ovniBonus = new Ovni(Reg.xComienzoOvni, Reg.yComienzoOvni);
 			ovniBonus.tipo = 4;
