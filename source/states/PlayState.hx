@@ -37,7 +37,10 @@ class PlayState extends FlxState
 	private var enemigosMuertosIndex:Array<Int>;
 	private var vidasSprite:Nave;
 	private var limite:Int;
+<<<<<<< HEAD
 	private var sonidoNum:Int = 1;
+=======
+>>>>>>> origin/master
 	
 	override public function create():Void
 	{
@@ -76,6 +79,8 @@ class PlayState extends FlxState
 		//Este array se usara para asegurarse de que, terminado un ciclo del timer, un enemigo dispare
 		//mediante el descarte de los enemigos que fueron destruidos
 		enemigosMuertosIndex = new Array();
+		
+		limite = Reg.rightXLimit + 6;
 		
 		limite = Reg.rightXLimit + 6;
 		
@@ -407,6 +412,7 @@ class PlayState extends FlxState
 		for (i in 0... enemigos.length)
 		{
 			
+<<<<<<< HEAD
 				if (enemigos.members[i].x >= limite && !direccionIzqEnemigos)
 				{
 					limite = Reg.leftXLimit + 4;
@@ -421,6 +427,24 @@ class PlayState extends FlxState
 					direccionIzqEnemigos = false;
 					enemigos.forEachAlive(BajarEnemigos);
 					Reg.YBajadaEnemigos = 0;
+=======
+				if (enemigos.members[i].x >= limite)
+				{
+					trace("hola");
+					trace(limite);
+					trace(enemigos.members[i].x);
+					enemigos.forEachAlive(CambiarDireccion);
+					limite = Reg.leftXLimit + 4;
+					break;
+				}
+				if (enemigos.members[i].x <= limite)
+				{
+					trace("chota");
+					trace(limite);
+					trace(enemigos.members[i].x);
+					enemigos.forEachAlive(CambiarDireccion);
+					limite = Reg.rightXLimit + 6;
+>>>>>>> origin/master
 					break;
 				}	
 			

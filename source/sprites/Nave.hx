@@ -52,6 +52,8 @@ class Nave extends FlxSprite
 			disparo.destroy();
 		}
 		
+		solid = false;
+		
 		sonidoMuerte.play();
 		
 		animation.play("muerte");
